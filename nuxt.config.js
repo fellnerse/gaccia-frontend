@@ -1,3 +1,5 @@
+const webpack = require('webpack')
+
 import colors from 'vuetify/es5/util/colors'
 
 export default {
@@ -66,7 +68,12 @@ export default {
       chunk: ({ isDev }) => (isDev ? '[name].js' : '[id].js'),
     },
     extend(config) {
-      config.optimization = { minimize: true }
+      config.output.filename = 'app.js';
+      config.optimization.runtimeChunk = false;
+      config.optimization.minimize = true
+      config.plugins.push(new webpack.optimize.LimitChunkCountPlugin({
+        maxChunks: 2 // 1 for client and 1 for server
+      }))
     },
   },
   generate: {

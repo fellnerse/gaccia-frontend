@@ -53,7 +53,7 @@ export default {
   mounted() {
     this.getTemperatures();
     this.lineChart= new Chart(this.ctx, this.config)
-    this.eventSource = new EventSource('http://coffee2.local/events')
+    this.eventSource = new EventSource('http://coffee.local/events')
 
     this.eventSource.addEventListener(
       'open',
@@ -90,7 +90,7 @@ export default {
   methods: {
     getTemperatures() {
       const xhr = new XMLHttpRequest();
-      xhr.open("GET", "http://coffee2.local/temperatures", true);
+      xhr.open("GET", "http://coffee.local/temperatures", true);
       xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
           const myObj = JSON.parse(xhr.responseText);
