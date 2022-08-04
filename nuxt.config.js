@@ -1,10 +1,14 @@
-const webpack = require('webpack')
-
 import colors from 'vuetify/es5/util/colors'
+import * as webpack from 'webpack'
+
+const repositoryName = 'gaccia-frontend'
 
 export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
+  router: {
+    base: '/' + repositoryName + '/',
+  },
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -68,12 +72,14 @@ export default {
       chunk: ({ isDev }) => (isDev ? '[name].js' : '[id].js'),
     },
     extend(config) {
-      config.output.filename = 'app.js';
-      config.optimization.runtimeChunk = false;
+      config.output.filename = 'app.js'
+      config.optimization.runtimeChunk = false
       config.optimization.minimize = true
-      config.plugins.push(new webpack.optimize.LimitChunkCountPlugin({
-        maxChunks: 2 // 1 for client and 1 for server
-      }))
+      config.plugins.push(
+        new webpack.optimize.LimitChunkCountPlugin({
+          maxChunks: 2, // 1 for client and 1 for server
+        })
+      )
     },
   },
   generate: {
