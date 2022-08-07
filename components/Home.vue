@@ -5,7 +5,6 @@
     <div v-show="hostname">
       <div class="text-h3">Current Stats</div>
       Hostname: {{ hostname }}
-      <v-btn @click="emptyLocalStorage">empty</v-btn>
       <div class=""> Stuff</div>
       <canvas id="myChart" width="400" height="400"></canvas>
       <script
@@ -13,7 +12,6 @@
         integrity="sha512-zjlf0U0eJmSo1Le4/zcZI51ks5SjuQXkU0yOdsOBubjSmio9iCUp8XPLkEAADZNBdR9crRy3cniZ65LF2w8sRA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     </div>
-
   </div>
 </template>
 
@@ -105,9 +103,6 @@ export default {
 
       console.log(this.lineChart.data);
       this.lineChart.update();
-    },
-    emptyLocalStorage() {
-      localStorage.clear();
     },
     setup(hostname) {
       this.getTemperatures(hostname);

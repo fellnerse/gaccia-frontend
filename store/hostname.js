@@ -20,4 +20,8 @@ export const mutations = {
     }
     return hostname
   },
+  empty(state) {
+    state.value = null
+    localStorage.clear()
+  },
 }
