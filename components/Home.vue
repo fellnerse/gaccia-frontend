@@ -14,16 +14,15 @@
           <LineChart :data="powerGraphData" :chart-options="options"></LineChart>
         </v-col>
       </v-row>
-      <v-btn :disabled="requestStatus === null" @click="setPIDStatus(1)">enable PID</v-btn>
-      <v-btn :disabled="requestStatus === null" @click="setPIDStatus(0)">disable PID</v-btn>
     </div>
+    <NodeSettings/>
   </div>
 </template>
 
 <script>
 
 export default {
-  name: "NuxtTutorial",
+  name: "IndexScreen",
   data() {
     return {
       data: {
@@ -164,20 +163,6 @@ export default {
       );
 
     },
-    async setPIDStatus(status) {
-      this.requestStatus = null
-      const response = await fetch("http://" + this.hostname + "/post?varPID_ON="+status, {
-        method: "POST"
-      })
-
-      if (response.status === 200){
-        this.requestStatus = true // todo => could request new settings
-      }
-      else {
-        this.errorMessage = (await response.text())
-        this.requestStatus = false
-      }
-    }
   }
 };
 </script>
