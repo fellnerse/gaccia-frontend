@@ -80,6 +80,9 @@ export default {
           maxChunks: 2, // 1 for client and 1 for server
         })
       )
+      config.node = {
+        fs: 'empty',
+      }
     },
   },
   generate: {

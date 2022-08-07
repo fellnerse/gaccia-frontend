@@ -1,69 +1,101 @@
-<!-- Please remove this file from your project -->
 <template>
   <div style="width:100%">
-    <HostnameSelection v-show="!hostname" class="mx-md-16"  />
+    <div v-show="errorMessage">{{errorMessage}}</div>
+    <HostnameSelection v-show="!hostname" class="mx-md-16" />
     <div v-show="hostname">
-      <div class="text-h3">Current Stats</div>
-      Hostname: {{ hostname }}
-      <div class=""> Stuff</div>
-      <canvas id="myChart" width="400" height="400"></canvas>
-      <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.2/chart.min.js"
-        integrity="sha512-zjlf0U0eJmSo1Le4/zcZI51ks5SjuQXkU0yOdsOBubjSmio9iCUp8XPLkEAADZNBdR9crRy3cniZ65LF2w8sRA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+      <v-row>
+        <v-col cols="md-4">
+          <LineChart :data="tempGraphData" :chart-options="options"></LineChart>
+        </v-col>
+        <v-col cols="md-4">
+          <LineChart :data="pressureGraphData" :chart-options="options"></LineChart>
+        </v-col>
+        <v-col cols="md-4">
+          <LineChart :data="powerGraphData" :chart-options="options"></LineChart>
+        </v-col>
+      </v-row>
+      <v-btn :disabled="requestStatus === null" @click="setPIDStatus(1)">enable PID</v-btn>
+      <v-btn :disabled="requestStatus === null" @click="setPIDStatus(0)">disable PID</v-btn>
     </div>
   </div>
 </template>
 
-<script crossorigin="anonymous" referrerpolicy="no-referrer">
-import HostnameSelection from "~/components/HostnameSelection";
+<script>
 
 export default {
   name: "NuxtTutorial",
-  components: { HostnameSelection },
   data() {
     return {
-      ctx: "myChart",
-      config: {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [{
-            label: "Temperatur",
-            data: [],
-            fill: false,
-            borderColor: "rgb(75, 192, 192)",
-            tension: 0.1
-          }, {
-            label: "Pressure",
-            data: [],
-            fill: false,
-            borderColor: "red",
-            tension: 0.1
-          },
-            {
-              label: "Amps",
-              data: [],
-              fill: false,
-              borderColor: "yellow",
-              tension: 0.1
-            }]
+      data: {
+        dates: [],
+        tempData: {
+          label: "Temperatur",
+          data: [],
+          fill: false,
+          borderColor: "rgb(75, 192, 192)",
+          tension: 0.1
         },
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
+        pressureData: {
+          label: "Pressure",
+          data: [],
+          fill: false,
+          borderColor: "red",
+          tension: 0.1
+        },
+        powerData: {
+          label: "Amps",
+          data: [],
+          fill: false,
+          borderColor: "yellow",
+          tension: 0.1
+        }
+      },
+      options: {
+        pointHitRadius: 2,
+        responsive: true,
+        scales: {
+          x: {
+            beginAtZero: true,
+            gridLines: {
+              display: false,
+              color: "#FFFFFF"
             }
+          },
+          y: {
+            beginAtZero: true
+          }
+        },
+        plugins: {
+          legend: {
+            position: "bottom"
+          }
+        },
+        elements: {
+          line: {
+            tension: 0
+          },
+          point: {
+            radius: 0
           }
         }
       },
-      lineChart: null,
       eventSource: null,
+      requestStatus: true,
+      errorMessage: null,
     };
   },
   computed: {
-    hostname () {
-      return this.$store.state.hostname.value
+    hostname() {
+      return this.$store.state.hostname.value;
+    },
+    tempGraphData() {
+      return { labels: this.data.dates, datasets: [this.data.tempData] };
+    },
+    pressureGraphData() {
+      return { labels: this.data.dates, datasets: [this.data.pressureData] };
+    },
+    powerGraphData() {
+      return { labels: this.data.dates, datasets: [this.data.powerData] };
     }
   },
   watch: {
@@ -74,7 +106,7 @@ export default {
     }
   },
   mounted() {
-    this.$store.commit("hostname/initStorage")
+    this.$store.commit("hostname/initStorage");
   },
   methods: {
     getTemperatures(hostname) {
@@ -83,30 +115,21 @@ export default {
       xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
           const myObj = JSON.parse(xhr.responseText);
-          console.log("got update", myObj);
-          this.plotData(myObj);
+          this.addData(myObj);
         }
       };
       xhr.send();
     },
-    plotData(data) {
-      console.log("plot data", data);
-      this.addData(new Date().toLocaleTimeString(), data);
-    },
-    addData(label, data) {
-      this.lineChart.data.labels.push(label);
-      console.log(this.lineChart.data.datasets);
-      this.lineChart.data.datasets[0].data.push(data.currentTemp);
-      this.lineChart.data.datasets[1].data.push(data.pressure);
-      this.lineChart.data.datasets[2].data.push(data.heaterPower);
-
-
-      console.log(this.lineChart.data);
-      this.lineChart.update();
+    addData(data) {
+      console.log("got update", data);
+      this.data.dates.push(new Date().toLocaleTimeString());
+      this.data.tempData.data.push(data.currentTemp);
+      this.data.pressureData.data.push(data.pressure);
+      this.data.powerData.data.push(data.heaterPower);
     },
     setup(hostname) {
       this.getTemperatures(hostname);
-      this.lineChart = new Chart(this.ctx, this.config);
+      // this.lineChart = new Chart(this.ctx, this.config);
       this.eventSource = new EventSource(`http://${hostname}/events`);
 
       this.eventSource.addEventListener(
@@ -136,10 +159,24 @@ export default {
 
       this.eventSource.addEventListener(
         "new_temps",
-        (event) => this.plotData(JSON.parse(event.data)),
+        (event) => this.addData(JSON.parse(event.data)),
         false
       );
 
+    },
+    async setPIDStatus(status) {
+      this.requestStatus = null
+      const response = await fetch("http://" + this.hostname + "/post?varPID_ON="+status, {
+        method: "POST"
+      })
+
+      if (response.status === 200){
+        this.requestStatus = true // todo => could request new settings
+      }
+      else {
+        this.errorMessage = (await response.text())
+        this.requestStatus = false
+      }
     }
   }
 };
