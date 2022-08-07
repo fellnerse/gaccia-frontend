@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app >
     <v-app-bar fixed app>
       <v-img
         max-height="64"
@@ -13,7 +13,7 @@
         <v-icon>mdi-menu</v-icon>
       </v-btn>
     </v-app-bar>
-    <v-navigation-drawer class="mt-16" v-model="rightDrawer" :right="true" temporary fixed>
+    <v-navigation-drawer v-model="rightDrawer" class="mt-16" :right="true" temporary fixed>
       <v-list>
         <v-list-item >
           <v-list-item-action>
@@ -23,10 +23,8 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-main>
-      <v-container>
+    <v-main >
         <Nuxt />
-      </v-container>
     </v-main>
     <v-footer :absolute="!fixed" app>
       <span>&copy; {{ new Date().getFullYear() }}</span>
