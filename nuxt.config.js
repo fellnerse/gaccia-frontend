@@ -1,15 +1,13 @@
 import colors from 'vuetify/es5/util/colors'
 import * as webpack from 'webpack'
 
-const repositoryName = 'gaccia-frontend'
-
 const lazyImports = []
 
 export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
   router: {
-    base: '/' + repositoryName + '/',
+    base: '/',
   },
 
   // Global page headers: https://go.nuxtjs.dev/config-head
