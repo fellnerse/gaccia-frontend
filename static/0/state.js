@@ -1,0 +1,1 @@
+window.__NUXT__=(function(a,b){return {staticAssetsBase:"\u002Fstatic\u002F0",layout:"default",error:a,state:{data:{temperatureValues:[],pressureValues:[],powerValues:[],dates:[]},hostname:{value:a},settings:{PIDStatus:a,requestState:"successful",errorMessage:a}},serverRendered:true,routePath:b,config:{_app:{basePath:b,assetsPath:b,cdnURL:a}}}}(null,"\u002F"));
