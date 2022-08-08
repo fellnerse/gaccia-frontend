@@ -3,6 +3,8 @@ import * as webpack from 'webpack'
 
 const repositoryName = 'gaccia-frontend'
 
+const lazyImports = []
+
 export default {
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
@@ -80,9 +82,35 @@ export default {
           maxChunks: 2, // 1 for client and 1 for server
         })
       )
-      config.node = {
-        fs: 'empty',
-      }
+      config.plugins.push(
+        new webpack.IgnorePlugin({
+          checkResource(resource) {
+            if (lazyImports.includes(resource)) {
+              try {
+                require.resolve(resource)
+              } catch (err) {
+                console.log(err)
+                return true
+              }
+            }
+            return false
+          },
+        })
+      )
+    },
+    babel: {
+      presets({ isServer }) {
+        return [
+          [
+            require.resolve('@nuxt/babel-preset-app'),
+            // require.resolve('@nuxt/babel-preset-app-edge'), // For nuxt-edge users
+            {
+              buildTarget: isServer ? 'server' : 'client',
+              corejs: { version: 3 },
+            },
+          ],
+        ]
+      },
     },
   },
   generate: {
