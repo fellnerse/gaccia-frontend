@@ -39,7 +39,7 @@ export const actions = {
         varPID_ON: state.PIDStatus,
       })
       if (result.ok) {
-        commit('setPIDStatus', !state.PIDStatus)
+        commit('setPIDStatus', state.PIDStatus ? 0 : 1)
         commit('setRequestState', RequestStatus.SUCCESSFUL)
       } else {
         commit('setRequestState', RequestStatus.FAILED)
